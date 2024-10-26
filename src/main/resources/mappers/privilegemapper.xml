@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.cwgl.dao.PrivilegeMapper">
+
+	<select id="getPrivilegeByRoleid" resultType="com.example.cwgl.entity.Privilege" parameterType="Integer">
+		select p.* from roleprivilieges rp LEFT JOIN privilege p on rp.privilegeID=p.ID where rp.roleID=#{roleid} order by privilegeNumber asc;
+	</select>
+
+	<insert id="addDefaultPrivilegesWhenAddRole">
+		insert into roleprivilieges (roleid,privilegeid) values
+		(#{roleid},62),
+		(#{roleid},63),
+		(#{roleid},64),
+		(#{roleid},65),
+		(#{roleid},66),
+		(#{roleid},67);
+	</insert>
+
+	<delete id="delPrivilegesWenDelRole">
+		delete from roleprivilieges where roleid = #{roleid}
+	</delete>
+
+</mapper>

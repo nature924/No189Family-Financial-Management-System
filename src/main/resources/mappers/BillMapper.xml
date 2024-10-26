@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 设置为IUserDao接口方法提供sql语句配置 -->
+<mapper namespace="com.example.cwgl.dao.BillMapper">
+
+    <insert id="add" parameterType="com.example.cwgl.entity.Bill" useGeneratedKeys="true" keyProperty="id">
+        insert into bill(id,title,userid,money,typeid,remark,paywayid)
+          value(null,#{title},#{userid},#{money},#{typeid},#{remark},#{paywayid})
+    </insert>
+
+    <update id="update" parameterType="com.example.cwgl.entity.Bill">
+        update bill
+          <set>
+              <if test="money!=null"> money = #{money}, </if>
+              <if test="typeid!=null"> typeid = #{typeid}, </if>
+              <if test="remark!=null"> remark = #{remark}, </if>
+              <if test="paywayid!=null"> paywayid = #{paywayid},</if>
+          </set>
+        where id = #{id}
+    </update>
+
+    <delete id="del">
+        delete from bill where id = #{id}
+    </delete>
+
+    <select id="findByWhereNoPage" resultType="com.example.cwgl.entity.Bill" parameterType="com.example.cwgl.entity.Bill">
+        select *, type.name type from bill left join type on bill.typeid = type.id left join payway on paywayid = payway.id left join user on bill.userid = user.id
+        <where>
+            <if test="id!=null">and bill.id = #{id}</if>
+            <if test="houseid!=null"> and userid in (select id from user where houseid = #{houseid})</if>
+            <if test="type!=null"> and typeid = #{type}</if>
+            <if test="userid!=null"> and userid = #{userid}</if>
+            <if test="title!=null"> and title = #{title}</if>
+            <if test="realname!=null"> and realname = #{realname}</if>
+            <if test="paywayid!=null"> and paywayid = #{paywayid}</if>
+            <if test="startTime!=null"> and time >= #{startTime}</if>
+            <if test="endTime!=null"> and time &lt;= #{endTime}</if>
+        </where>
+    </select>
+
+    <select id="findByWhere" resultType="com.example.cwgl.entity.Bill" parameterType="com.example.cwgl.utils.PageModel">
+        select bill.* , user.realname, payway.payway, type.name type from bill left join user on bill.userid = user.id left join type on bill.typeid = type.id
+        left join payway on paywayid = payway.id
+        <where>
+            <if test="data.houseid!=null"> and userid in (select id from user where houseid = #{data.houseid})</if>
+            <if test="data.id!=null"> and bill.id = #{data.id}</if>
+            <if test="data.title!=null"> and bill.title = #{data.title}</if>
+            <if test="data.type!=null"> and bill.typeid = #{data.type}</if>
+            <if test="data.userid!=null"> and bill.userid = #{data.userid}</if>
+            <if test="data.realname!=null "> and realname like concat('%',#{data.realname},'%')</if>
+            <if test="data.money!=null"> and money = #{data.money}</if>
+            <if test="data.remark!=null"> and remark like concat('%',#{data.remark},'%')</if>
+            <if test="data.paywayid!=null"> and paywayid = #{data.paywayid}</if>
+            <if test="data.startTime!=null"> and time >= #{data.startTime}</if>
+            <if test="data.endTime!=null"> and time &lt;= #{data.endTime}</if>
+        </where>
+        order by time desc
+        limit #{beginIndex},#{pageSize}
+    </select>
+
+    <select id="getMonthlyInfo" resultType="java.util.HashMap" parameterType="com.example.cwgl.utils.PageModel">
+        select typeid, sum(money) from bill where userid = #{data.userid} and time >= #{data.startTime}  and time &lt;= #{data.endTime} GROUP BY typeid
+    </select>
+
+    <select id="getTotalByWhere" resultType="java.lang.Integer" parameterType="com.example.cwgl.utils.PageModel">
+        select count(bill.id) from bill left join user on bill.userid = user.id left join type on bill.typeid = type.id
+        left join payway on paywayid = payway.id
+        <where>
+            <if test="data.houseid!=null"> and userid in (select id from user where houseid = #{data.houseid})</if>
+            <if test="data.id!=null"> and bill.id = #{data.id}</if>
+            <if test="data.title!=null"> and bill.title = #{data.title}</if>
+            <if test="data.type!=null"> and bill.typeid = #{data.type}</if>
+            <if test="data.userid!=null"> and bill.userid = #{data.userid}</if>
+            <if test="data.realname!=null "> and realname like concat('%',#{data.realname},'%')</if>
+            <if test="data.money!=null"> and money = #{data.money}</if>
+            <if test="data.remark!=null"> and remark like concat('%',#{data.remark},'%')</if>
+            <if test="data.paywayid!=null"> and paywayid = #{data.paywayid}</if>
+            <if test="data.startTime!=null"> and time >= #{data.startTime}</if>
+            <if test="data.endTime!=null"> and time &lt;= #{data.endTime}</if>
+        </where>
+    </select>
+
+
+    <select id="getAllPayways" resultType="com.example.cwgl.entity.Payway">
+        select * from payway
+    </select>
+
+
+
+</mapper>

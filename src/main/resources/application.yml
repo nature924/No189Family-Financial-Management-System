@@ -1,0 +1,24 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/cwgl?characterEncoding=utf-8&serverTimezone=UTC
+    username: root
+    password: root
+  jpa:
+    database: mysql
+  mvc:
+    static-path-pattern: /static/**
+    throw-exception-if-no-handler-found: true
+  thymeleaf:
+    cache: false
+mybatis:
+  mapper-locations: classpath:mappers/*.xml
+  type-aliases-package: com.example.cwgl.entity
+
+logging:
+  level:
+    root: info
+    org:
+      springframework:
+        web: info
+    com.example.cwgl.dao: debug

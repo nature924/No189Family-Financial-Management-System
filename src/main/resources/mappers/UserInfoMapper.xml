@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 设置为IUserDao接口方法提供sql语句配置 -->
+<mapper namespace="com.example.cwgl.dao.UserInfoMapper">
+
+    <select id="getUserInfo" resultType="com.example.cwgl.entity.UserInfo" parameterType="com.example.cwgl.entity.UserInfo">
+        SELECT * FROM user
+        <where>
+            <if test="id!=null">and id=#{id}</if>
+            <if test="username!=null and username.length()>0">and username = #{username}</if>
+            <if test="password!=null and password.length()>0">and password = #{password}</if>
+        </where>
+    </select>
+
+    <select id="userIsExisted" resultType="java.lang.Integer" parameterType="com.example.cwgl.entity.UserInfo">
+        SELECT count(*) FROM user where username = #{username}
+    </select>
+
+
+    <select id="getUsersByWhere" resultType="com.example.cwgl.entity.UserInfo" parameterType="com.example.cwgl.entity.UserInfo">
+        SELECT *, rolename FROM user left join role on role.roleid = user.roleid
+        <where>
+            <if test="data.username!=null">(username = #{data.username} or realname = #{data.realname})</if>
+            <if test="data.roleid!=null and data.roleid!=-1">and user.roleid >= #{data.roleid}</if>
+            <if test="data.houseid!=null and data.houseid.length!=0">and houseid = #{data.houseid}</if>
+        </where>
+        order by user.roleid asc
+        limit #{beginIndex},#{pageSize}
+    </select>
+
+    <select id="getToatlByWhere" resultType="java.lang.Integer" parameterType="com.example.cwgl.utils.PageModel">
+        SELECT count(id) FROM user left join role on role.roleid = user.roleid
+        <where>
+            <if test="data.username!=null">(username = #{data.username} or realname = #{data.realname})</if>
+            <if test="data.roleid!=null and data.roleid!=-1">and user.roleid >= #{data.roleid}</if>
+            <if test="data.houseid!=null and data.houseid.length!=0">and houseid = #{data.houseid}</if>
+        </where>
+    </select>
+
+    <select id="getAllRoles" resultType="com.example.cwgl.entity.Role" parameterType="com.example.cwgl.entity.Role">
+        select * from role
+    </select>
+
+    <insert id="add" parameterType="com.example.cwgl.entity.UserInfo" useGeneratedKeys="true" keyProperty="id">
+        insert into user(id,username,password,roleid,realname,houseid,photo)
+          values(#{id},#{username},#{password},#{roleid},#{realname},#{houseid},#{iconUrl})
+    </insert>
+
+    <update id="update" parameterType="com.example.cwgl.entity.UserInfo">
+        update user
+        <set>
+            <if test="password!=null and password.length()>0"> password = #{password}, </if>
+            <if test="realname!=null and realname.length()>0"> realname = #{realname}, </if>
+            <if test="houseid!=null and houseid.length()>0"> houseid = #{houseid}, </if>
+            <if test="iconUrl!=null and iconUrl.length()>0"> photo = #{iconUrl}, </if>
+        </set>
+        where id=#{id}
+    </update>
+
+    <delete id="delete">
+        delete from user where id=#{id}
+    </delete>
+
+    <insert id="addRole" parameterType="com.example.cwgl.entity.Role" useGeneratedKeys="true" keyProperty="roleid">
+        insert into role(roleid,rolename)
+          values(null,#{rolename})
+    </insert>
+
+    <update id="updateRole" parameterType="com.example.cwgl.entity.Role">
+        update role set rolename = #{rolename} where roleid=#{roleid}
+    </update>
+
+    <delete id="deleteRole">
+        delete from role where roleid=#{id}
+    </delete>
+
+    <select id="getRoleById" resultType="com.example.cwgl.entity.Role">
+        select * from role where roleid=#{id}
+    </select>
+
+    <insert id="addHouseId" useGeneratedKeys="true" keyProperty="id">
+        insert into house values(null,#{ownerid},#{address})
+    </insert>
+
+
+
+</mapper>
